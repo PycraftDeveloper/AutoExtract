@@ -25,3 +25,6 @@ This small tutorial will only work for compiled editions of the project.
 
 ## Supported Files
 Currently the project only supports '.zip' archives, other file types may be added in future revisions, apologies if this is inconvenient. Also, ALWAYS make sure your downloading files you trust, this project will not touch other files in the download folder, including other executables, but extracting archives can be dangerous if you do not trust the creator, so be careful and I hope this project has been helpful!
+
+## Performance Comparison
+![image](https://user-images.githubusercontent.com/81379254/167310217-54c977a6-0aa7-4fa6-9e82-a44704497388.png)
