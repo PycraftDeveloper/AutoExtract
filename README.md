@@ -1,5 +1,5 @@
 # AutoExtract
-A small project designed to automatically extract archives from the downloads folder
+A small project designed to automatically extract archives from the downloads folder.
 
 ## Overview
 This project is designed to run in the background of your computer and every 10 seconds it will scan your downloads folder for archives, if it finds an archive then it will automatically extract the file to the downloads folder and remove the original file. Unfortunately, this has only be tested on Windows (10 and 11), but Linux compatibility will be added in a future revision.
