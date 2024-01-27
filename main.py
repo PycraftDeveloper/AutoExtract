@@ -6,6 +6,8 @@ from shutil import unpack_archive
 
 from send2trash import send2trash
 from py7zr import SevenZipFile
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 def get_download_path():
     """Returns the default downloads path for linux or windows"""
@@ -24,23 +26,62 @@ downloads_path = get_download_path()
 
 basic_archive_types = [".zip", ".tar", ".gztar", ".bztar", ".xztar"]
 
-while True:
-    try:
-        files = listdir(downloads_path)
-        for file in files:
-            if any(x in file for x in basic_archive_types):
-                unpack_archive(
-                    rf"{downloads_path}\{file}",
-                    rf"{downloads_path}")
+class EventHandler(FileSystemEventHandler):
+    def __init__(self):
+        self.whitelist = []
 
-                send2trash(rf"{downloads_path}\{file}")
+    def on_modified(self, event):
+        if event.is_directory is False:
+            file = event.src_path
+            if not file in self.whitelist:
+                self.whitelist.append(file)
+                try:
+                    try:
+                            unpack_archive(
+                                file,
+                                rf"{downloads_path}")
 
-            elif ".7z" in file:
+                            send2trash(file)
+
+                    except:
+                        try:
+                            with SevenZipFile(file, mode='r') as archive:
+                                archive.extractall(path=rf"{downloads_path}")
+
+                            send2trash(file)
+                        except:
+                            pass
+                except Exception as error:
+                    print(error)
+
+                self.whitelist.remove(file)
+
+if __name__ == "__main__":
+    files = listdir(downloads_path)
+    for file in files:
+        try:
+            unpack_archive(
+                rf"{downloads_path}\{file}",
+                rf"{downloads_path}")
+
+            send2trash(rf"{downloads_path}\{file}")
+
+        except:
+            try:
                 with SevenZipFile(rf"{downloads_path}\{file}", mode='r') as archive:
                     archive.extractall(path=rf"{downloads_path}")
 
                 send2trash(rf"{downloads_path}\{file}")
-    except Exception as error:
-        print(error)
+            except:
+                pass
 
-    sleep(10)
+    event_handler = EventHandler()
+    observer = Observer()
+    observer.schedule(event_handler, downloads_path, recursive=True)
+    observer.start()
+    try:
+        while True:
+            sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()

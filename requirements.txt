@@ -1,2 +1,3 @@
 send2trash
 py7zr
+watchdog
