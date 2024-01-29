@@ -24,8 +24,6 @@ def get_download_path():
 
 downloads_path = get_download_path()
 
-basic_archive_types = [".zip", ".tar", ".gztar", ".bztar", ".xztar"]
-
 class EventHandler(FileSystemEventHandler):
     def __init__(self):
         self.whitelist = []
