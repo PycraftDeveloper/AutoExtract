@@ -42,3 +42,5 @@ Optionally, you can hit `Win + R` and type `shell:startup` to place a shortcut t
 
 ## Prformance Comparison
 
+![image](https://github.com/PycraftDeveloper/AutoExtract/assets/81379254/e163ae53-e025-4c03-8259-bb9fccb88175)
+
