@@ -1,5 +1,5 @@
 from os.path import expanduser
-from os import path, listdir
+from os import path, listdir, sep
 from time import sleep
 from platform import system
 from shutil import unpack_archive
@@ -24,6 +24,29 @@ def get_download_path():
 
 downloads_path = get_download_path()
 
+def extractor(file):
+    if ".crdownload" in file:
+        return
+    formatted_file = file.split(sep)[-1].split(".")[0]
+    destination_name = f"Extracted {formatted_file}"
+    destination = downloads_path+sep+destination_name
+    sleep(0.5)
+    try:
+        unpack_archive(
+            file,
+            destination)
+
+        send2trash(file)
+
+    except:
+        try:
+            with SevenZipFile(file, mode='r') as archive:
+                archive.extractall(path=destination)
+
+            send2trash(file)
+        except:
+            pass
+
 class EventHandler(FileSystemEventHandler):
     def __init__(self):
         self.whitelist = []
@@ -31,55 +54,20 @@ class EventHandler(FileSystemEventHandler):
     def on_modified(self, event):
         if event.is_directory is False:
             file = event.src_path
-            if not file in self.whitelist:
+            if file not in self.whitelist:
                 self.whitelist.append(file)
-                try:
-                    try:
-                            unpack_archive(
-                                file,
-                                rf"{downloads_path}")
 
-                            send2trash(file)
-
-                    except:
-                        try:
-                            with SevenZipFile(file, mode='r') as archive:
-                                archive.extractall(path=rf"{downloads_path}")
-
-                            send2trash(file)
-                        except:
-                            pass
-                except Exception as error:
-                    print(error)
+                extractor(file)
 
                 self.whitelist.remove(file)
 
 if __name__ == "__main__":
     files = listdir(downloads_path)
     for file in files:
-        try:
-            unpack_archive(
-                rf"{downloads_path}\{file}",
-                rf"{downloads_path}")
-
-            send2trash(rf"{downloads_path}\{file}")
-
-        except:
-            try:
-                with SevenZipFile(rf"{downloads_path}\{file}", mode='r') as archive:
-                    archive.extractall(path=rf"{downloads_path}")
-
-                send2trash(rf"{downloads_path}\{file}")
-            except:
-                pass
+        extractor(downloads_path+sep+file)
 
     event_handler = EventHandler()
     observer = Observer()
     observer.schedule(event_handler, downloads_path, recursive=True)
     observer.start()
-    try:
-        while True:
-            sleep(1)
-    except KeyboardInterrupt:
-        observer.stop()
     observer.join()
