@@ -25,16 +25,17 @@ def get_download_path():
 downloads_path = get_download_path()
 
 def extractor(file):
-    if ".crdownload" in file:
+    if ".crdownload" in file or ".tmp" in file:
         return
     formatted_file = file.split(sep)[-1].split(".")[0]
     destination_name = f"Extracted {formatted_file}"
     destination = downloads_path+sep+destination_name
-    sleep(0.5)
     try:
         unpack_archive(
             file,
             destination)
+
+        sleep(0.5)
 
         send2trash(file)
 
@@ -42,6 +43,8 @@ def extractor(file):
         try:
             with SevenZipFile(file, mode='r') as archive:
                 archive.extractall(path=destination)
+
+            sleep(0.5)
 
             send2trash(file)
         except:
@@ -68,6 +71,6 @@ if __name__ == "__main__":
 
     event_handler = EventHandler()
     observer = Observer()
-    observer.schedule(event_handler, downloads_path, recursive=True)
+    observer.schedule(event_handler, downloads_path, recursive=False)
     observer.start()
     observer.join()
